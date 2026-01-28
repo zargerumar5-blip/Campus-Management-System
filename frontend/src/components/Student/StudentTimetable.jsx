@@ -25,7 +25,7 @@ const StudentTimetable = ({ isDark }) => {
         if (!user || !user._id) return;
 
         // Fetch Profile
-        const profileRes = await axios.get(`http://localhost:5000/api/students/profile/${user._id}`);
+        const profileRes = await axios.get(`https://campus-management-system-xf9a.onrender.com/api/students/profile/${user._id}`);
         const enrolledCourse = profileRes.data.course;
 
         if (enrolledCourse) {
@@ -53,7 +53,7 @@ const StudentTimetable = ({ isDark }) => {
       setLoading(true);
       try {
         // Strictly fetch schedule for the enrolled course ONLY
-        const res = await axios.get(`http://localhost:5000/api/schedule/batch/${myCourse}`);
+        const res = await axios.get(`https://campus-management-system-xf9a.onrender.com/api/schedule/batch/${myCourse}`);
         setSchedule(res.data);
       } catch (err) {
         console.error("Error loading schedule:", err);

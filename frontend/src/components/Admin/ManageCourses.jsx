@@ -10,7 +10,7 @@ const ManageCourses = ({ isDark }) => {
   // Fetch all courses & SORT A-Z
   const fetchCourses = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/courses');
+      const res = await axios.get('https://campus-management-system-xf9a.onrender.com/api/courses');
       
       // --- SORTING LOGIC ADDED HERE (By Name A-Z) ---
       const sortedCourses = res.data.sort((a, b) => a.name.localeCompare(b.name));
@@ -26,12 +26,12 @@ const ManageCourses = ({ isDark }) => {
     try {
       if (editingId) {
         // UPDATE Logic
-        await axios.put(`http://localhost:5000/api/courses/${editingId}`, form);
+        await axios.put(`https://campus-management-system-xf9a.onrender.com/api/courses/${editingId}`, form);
         alert('✅ Course Updated!');
         setEditingId(null);
       } else {
         // CREATE Logic
-        await axios.post('http://localhost:5000/api/courses/add', form);
+        await axios.post('https://campus-management-system-xf9a.onrender.com/api/courses/add', form);
         alert('✅ Course Added!');
       }
       setForm({ name: '', code: '', description: '' });
@@ -46,7 +46,7 @@ const ManageCourses = ({ isDark }) => {
 
   const handleDelete = async (id) => {
     if(!window.confirm("Delete this course?")) return;
-    await axios.delete(`http://localhost:5000/api/courses/${id}`);
+    await axios.delete(`https://campus-management-system-xf9a.onrender.com/api/courses/${id}`);
     fetchCourses();
   };
 

@@ -23,7 +23,7 @@ const MyAttendance = ({ isDark }) => {
         }
 
         // 1. Call the Backend API
-        const res = await axios.get(`http://localhost:5000/api/attendance/user/${user._id}`);
+        const res = await axios.get(`https://campus-management-system-xf9a.onrender.com/api/attendance/user/${user._id}`);
         const data = res.data;
 
         // 2. Calculate Real Stats

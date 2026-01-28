@@ -24,8 +24,7 @@ app.use(cors());
 app.use('/uploads', express.static('uploads'));
 
 // Database
-const MONGO_URI = 'mongodb://127.0.0.1:27017/student_management_system';
-mongoose.connect(MONGO_URI)
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ MongoDB Connected Successfully (Localhost)'))
   .catch((err) => console.error('❌ MongoDB Connection Error:', err));
 

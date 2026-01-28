@@ -18,7 +18,7 @@ const StudentRecords = ({ isDark }) => {
 
   const fetchStudents = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/students');
+      const res = await axios.get('https://campus-management-system-xf9a.onrender.com/api/students');
       setStudents(res.data);
     } catch (err) {
       console.error("Error fetching students:", err);
@@ -37,7 +37,7 @@ const StudentRecords = ({ isDark }) => {
     if (!newName || !newRoll || !newBatch || !newCourse) return; // Cancelled
 
     try {
-      await axios.put(`http://localhost:5000/api/students/${student._id}`, {
+      await axios.put(`https://campus-management-system-xf9a.onrender.com/api/students/${student._id}`, {
         name: newName,
         rollNum: newRoll,
         batch: newBatch,
@@ -63,7 +63,7 @@ const StudentRecords = ({ isDark }) => {
     }
 
     try {
-      await axios.put(`http://localhost:5000/api/students/fees/${id}`, { amount });
+      await axios.put(`https://campus-management-system-xf9a.onrender.com/api/students/fees/${id}`, { amount });
       alert("✅ Fees Updated Successfully!");
       fetchStudents();
     } catch (err) {
@@ -75,7 +75,7 @@ const StudentRecords = ({ isDark }) => {
   const handleDelete = async (id) => {
     if(!window.confirm("Are you sure you want to delete this student?")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/students/${id}`);
+      await axios.delete(`https://campus-management-system-xf9a.onrender.com/api/students/${id}`);
       fetchStudents();
     } catch (err) {
       alert("Error deleting student");

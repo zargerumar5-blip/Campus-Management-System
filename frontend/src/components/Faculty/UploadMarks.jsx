@@ -28,8 +28,8 @@ const UploadMarks = ({ isDark }) => {
   const fetchInitData = async () => {
     try {
       const [sRes, eRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/students'),
-        axios.get('http://localhost:5000/api/exams')
+        axios.get('https://campus-management-system-xf9a.onrender.com/api/students'),
+        axios.get('https://campus-management-system-xf9a.onrender.com/api/exams')
       ]);
 
       setStudents(sRes.data.sort((a, b) => (a.userId?.name || "").localeCompare(b.userId?.name || "")));
@@ -117,7 +117,7 @@ const UploadMarks = ({ isDark }) => {
         const marks = marksMap[student._id];
         if (marks === '' || marks === undefined) return null;
 
-        return axios.post('http://localhost:5000/api/exams/upload-result', {
+        return axios.post('https://campus-management-system-xf9a.onrender.com/api/exams/upload-result', {
           examId: exams.find(e => e.title === selectedExam)?._id,
           studentRoll: student.rollNum,
           marks: parseInt(marks)

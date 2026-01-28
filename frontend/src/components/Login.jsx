@@ -30,7 +30,7 @@ const Login = () => {
 
     try {
       // 1. Send credentials to Backend
-      const res = await axios.post('http://localhost:5000/api/auth/login', {
+      const res = await axios.post('https://campus-management-system-xf9a.onrender.com/api/auth/login', {
         email,
         password
       });

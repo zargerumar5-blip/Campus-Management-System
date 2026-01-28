@@ -34,7 +34,7 @@ const AdminDashboard = () => {
     formData.append('profileImg', file);
 
     try {
-      const res = await axios.post(`https://my-first-deploy-n8du.onrender.com/api/upload/admin/${user._id}`, formData, {
+      const res = await axios.post(`https://campus-management-system-xf9a.onrender.com/api/upload/admin/${user._id}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       const updatedUser = { ...user, profileImg: res.data.filePath };
@@ -79,7 +79,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await axios.get('https://my-first-deploy-n8du.onrender.com/api/dashboard/stats');
+        const res = await axios.get('https://campus-management-system-xf9a.onrender.com/api/dashboard/stats');
         setStats(res.data);
       } catch (err) { console.error(err); }
     };
@@ -122,7 +122,7 @@ const AdminDashboard = () => {
              <div className="w-20 h-20 rounded-full overflow-hidden bg-white/10 flex items-center justify-center text-3xl font-bold shadow-lg border-2 border-white/20">
                {user.profileImg ? (
                  <img 
-                   src={`https://my-first-deploy-n8du.onrender.com${user.profileImg}`} 
+                   src={`https://campus-management-system-xf9a.onrender.com${user.profileImg}`} 
                    alt="Profile" 
                    className="w-full h-full object-cover" 
                    onError={(e) => {e.target.onerror = null; e.target.src=""}} 

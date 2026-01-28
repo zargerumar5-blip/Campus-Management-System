@@ -3,7 +3,6 @@ const User = require('./models/User');
 const Student = require('./models/Student');
 
 // Database Connection
-const MONGO_URI = 'mongodb://127.0.0.1:27017/student_management_system';
 
 mongoose.connect(MONGO_URI)
   .then(() => console.log('✅ Connected to MongoDB for Seeding'))

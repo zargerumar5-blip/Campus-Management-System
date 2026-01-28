@@ -13,14 +13,14 @@ const ManageFaculty = ({ isDark }) => {
   const fetchData = async () => {
     try {
       // 1. Fetch & Sort Faculty (A-Z by Name)
-      const fRes = await axios.get('http://localhost:5000/api/faculty');
+      const fRes = await axios.get('https://campus-management-system-xf9a.onrender.com/api/faculty');
       const sortedFaculty = fRes.data.sort((a, b) => 
         (a.userId?.name || "").localeCompare(b.userId?.name || "")
       );
       setFacultyList(sortedFaculty);
 
       // 2. Fetch & Sort Courses/Departments (A-Z)
-      const cRes = await axios.get('http://localhost:5000/api/courses');
+      const cRes = await axios.get('https://campus-management-system-xf9a.onrender.com/api/courses');
       const sortedCourses = cRes.data.sort((a, b) => a.name.localeCompare(b.name));
       setCourses(sortedCourses);
 
@@ -33,11 +33,11 @@ const ManageFaculty = ({ isDark }) => {
     e.preventDefault();
     try {
       if (editingId) {
-        await axios.put(`http://localhost:5000/api/faculty/${editingId}`, formData);
+        await axios.put(`https://campus-management-system-xf9a.onrender.com/api/faculty/${editingId}`, formData);
         alert('✅ Faculty Updated!');
         setEditingId(null);
       } else {
-        await axios.post('http://localhost:5000/api/faculty/add', formData);
+        await axios.post('https://campus-management-system-xf9a.onrender.com/api/faculty/add', formData);
         alert('✅ Faculty Added!');
       }
       setFormData({ name: '', email: '', password: 'svm123', employeeId: '', department: '', designation: '', qualifications: '' });
@@ -60,7 +60,7 @@ const ManageFaculty = ({ isDark }) => {
 
   const handleDelete = async (id) => {
     if(!window.confirm("Delete this faculty member?")) return;
-    await axios.delete(`http://localhost:5000/api/faculty/${id}`);
+    await axios.delete(`https://campus-management-system-xf9a.onrender.com/api/faculty/${id}`);
     fetchData();
   };
 

@@ -12,7 +12,7 @@ const StudentList = ({ isDark }) => {
   // Fetch all students & SORT A-Z
   const fetchStudents = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/students');
+      const res = await axios.get('https://campus-management-system-xf9a.onrender.com/api/students');
       
       // --- SORTING LOGIC ADDED HERE (By Name A-Z) ---
       const sortedStudents = res.data.sort((a, b) => 
@@ -33,7 +33,7 @@ const StudentList = ({ isDark }) => {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this student? All fee and attendance records will be lost.")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/students/${id}`);
+      await axios.delete(`https://campus-management-system-xf9a.onrender.com/api/students/${id}`);
       alert("Student deleted successfully");
       fetchStudents();
     } catch (err) {
@@ -55,7 +55,7 @@ const StudentList = ({ isDark }) => {
   // --- CRUD: SAVE CHANGES ---
   const handleSaveEdit = async () => {
     try {
-      await axios.put(`http://localhost:5000/api/students/${editingId}`, editForm);
+      await axios.put(`https://campus-management-system-xf9a.onrender.com/api/students/${editingId}`, editForm);
       alert("✅ Student Updated Successfully!");
       setEditingId(null);
       fetchStudents();
@@ -76,7 +76,7 @@ const StudentList = ({ isDark }) => {
     }
 
     try {
-      await axios.put(`http://localhost:5000/api/students/fees/${studentId}`, { amount });
+      await axios.put(`https://campus-management-system-xf9a.onrender.com/api/students/fees/${studentId}`, { amount });
       alert(`₹${amount} Added Successfully!`);
       fetchStudents();
     } catch (error) {

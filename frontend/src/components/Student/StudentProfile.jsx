@@ -35,7 +35,7 @@ const StudentProfile = ({ isDark }) => {
         return;
       }
 
-      const res = await axios.get(`http://localhost:5000/api/students/profile/${user._id}`);
+      const res = await axios.get(`https://campus-management-system-xf9a.onrender.com/api/students/profile/${user._id}`);
       
       if (res.data) {
         setStudent(res.data);
@@ -60,7 +60,7 @@ const StudentProfile = ({ isDark }) => {
     }
 
     try {
-      await axios.put(`http://localhost:5000/api/students/update/${student._id}`, {
+      await axios.put(`https://campus-management-system-xf9a.onrender.com/api/students/update/${student._id}`, {
         email: formData.email,
         password: formData.password ? formData.password : undefined
       });

@@ -13,7 +13,7 @@ const Settings = ({ isDark, currentLang, setLanguage, currentTheme, toggleTheme 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
     if (user && user._id) {
-       axios.get(`http://localhost:5000/api/students/profile/${user._id}`)
+       axios.get(`https://campus-management-system-xf9a.onrender.com/api/students/profile/${user._id}`)
          .then(res => setStudentId(res.data._id))
          .catch(err => console.error(err));
     }
@@ -28,7 +28,7 @@ const Settings = ({ isDark, currentLang, setLanguage, currentTheme, toggleTheme 
     // 2. Save to Database Automatically
     if (studentId) {
       try {
-        await axios.put(`http://localhost:5000/api/students/${studentId}`, {
+        await axios.put(`https://campus-management-system-xf9a.onrender.com/api/students/${studentId}`, {
           language: lang
         });
         // Optional: Show a small "Saved" feedback text

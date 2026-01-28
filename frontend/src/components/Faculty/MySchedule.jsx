@@ -33,8 +33,8 @@ const MySchedule = ({ isDark }) => {
       const user = JSON.parse(localStorage.getItem('user'));
 
       const [schRes, courseRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/schedule'),
-        axios.get('http://localhost:5000/api/courses')
+        axios.get('https://campus-management-system-xf9a.onrender.com/api/schedule'),
+        axios.get('https://campus-management-system-xf9a.onrender.com/api/courses')
       ]);
 
       // Filter: Show only MY classes
@@ -66,12 +66,12 @@ const MySchedule = ({ isDark }) => {
 
       if (editingId) {
         // --- UPDATE EXISTING CLASS ---
-        await axios.put(`http://localhost:5000/api/schedule/${editingId}`, payload);
+        await axios.put(`https://campus-management-system-xf9a.onrender.com/api/schedule/${editingId}`, payload);
         alert('✅ Class Updated Successfully!');
         setEditingId(null);
       } else {
         // --- CREATE NEW CLASS ---
-        await axios.post('http://localhost:5000/api/schedule', payload);
+        await axios.post('https://campus-management-system-xf9a.onrender.com/api/schedule', payload);
         alert('✅ Class Added Successfully!');
       }
 
@@ -108,7 +108,7 @@ const MySchedule = ({ isDark }) => {
   const handleDelete = async (id) => {
     if(!window.confirm("Delete this class?")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/schedule/${id}`);
+      await axios.delete(`https://campus-management-system-xf9a.onrender.com/api/schedule/${id}`);
       fetchData();
     } catch (err) {
       console.error(err);

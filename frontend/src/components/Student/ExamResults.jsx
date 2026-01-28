@@ -22,12 +22,12 @@ const ExamResults = ({ isDark }) => {
         if (!user || !user._id) return;
 
         // 1. Get Student ID from Profile
-        const profileRes = await axios.get(`http://localhost:5000/api/students/profile/${user._id}`);
+        const profileRes = await axios.get(`https://campus-management-system-xf9a.onrender.com/api/students/profile/${user._id}`);
         const studentId = profileRes.data._id; // This is the ID used in Exam results
         setStudentName(profileRes.data.userId?.name || user.name);
 
         // 2. Fetch All Exams from Source of Truth
-        const examsRes = await axios.get('http://localhost:5000/api/exams');
+        const examsRes = await axios.get('https://campus-management-system-xf9a.onrender.com/api/exams');
         const allExams = examsRes.data;
 
         // 3. Filter & Group Exams by Title (e.g., "Semester 1" might have Math, Science, etc.)

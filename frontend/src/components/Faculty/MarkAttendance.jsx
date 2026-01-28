@@ -41,8 +41,8 @@ const MarkAttendance = ({ isDark }) => {
     const fetchData = async () => {
       try {
         const [studentRes, courseRes] = await Promise.all([
-          axios.get('http://localhost:5000/api/students'),
-          axios.get('http://localhost:5000/api/courses')
+          axios.get('https://campus-management-system-xf9a.onrender.com/api/students'),
+          axios.get('https://campus-management-system-xf9a.onrender.com/api/courses')
         ]);
         setStudents(studentRes.data);
         setCourses(courseRes.data.sort((a, b) => a.name.localeCompare(b.name)));
@@ -75,7 +75,7 @@ const MarkAttendance = ({ isDark }) => {
         setFilteredStudents(filtered);
 
         // B. Fetch Existing Attendance
-        const attRes = await axios.get(`http://localhost:5000/api/attendance/batch/${selectedCourse}/${dateStr}`);
+        const attRes = await axios.get(`https://campus-management-system-xf9a.onrender.com/api/attendance/batch/${selectedCourse}/${dateStr}`);
         const existingRecords = attRes.data;
 
         const statusMap = {};
@@ -107,7 +107,7 @@ const MarkAttendance = ({ isDark }) => {
         const offsetDate = new Date(selectedDate.getTime() - (selectedDate.getTimezoneOffset() * 60000));
         const monthStr = offsetDate.toISOString().substring(0, 7); // YYYY-MM
 
-        const res = await axios.get(`http://localhost:5000/api/attendance/report/${selectedCourse}/${monthStr}`);
+        const res = await axios.get(`https://campus-management-system-xf9a.onrender.com/api/attendance/report/${selectedCourse}/${monthStr}`);
         
         // Extract unique dates that have records
         const uniqueDates = [...new Set(res.data.map(item => item.date))];
@@ -130,7 +130,7 @@ const MarkAttendance = ({ isDark }) => {
 
     try {
       const promises = filteredStudents.map(student => {
-        return axios.post('http://localhost:5000/api/attendance', {
+        return axios.post('https://campus-management-system-xf9a.onrender.com/api/attendance', {
           studentId: student._id,
           date: dateStr,
           batch: selectedCourse, 
@@ -145,7 +145,7 @@ const MarkAttendance = ({ isDark }) => {
       
       // Refresh the "Marked Dates" list
       const monthStr = dateStr.substring(0, 7); 
-      const res = await axios.get(`http://localhost:5000/api/attendance/report/${selectedCourse}/${monthStr}`);
+      const res = await axios.get(`https://campus-management-system-xf9a.onrender.com/api/attendance/report/${selectedCourse}/${monthStr}`);
       const uniqueDates = [...new Set(res.data.map(item => item.date))];
       setMarkedDates(uniqueDates.map(d => new Date(d)));
 
@@ -160,7 +160,7 @@ const MarkAttendance = ({ isDark }) => {
     const monthStr = offsetDate.toISOString().substring(0, 7);
 
     try {
-      const res = await axios.get(`http://localhost:5000/api/attendance/report/${selectedCourse}/${monthStr}`);
+      const res = await axios.get(`https://campus-management-system-xf9a.onrender.com/api/attendance/report/${selectedCourse}/${monthStr}`);
       const monthlyRecords = res.data;
       const doc = new jsPDF();
       

@@ -37,7 +37,7 @@ const FacultyDashboard = () => {
     formData.append('profileImg', file);
 
     try {
-      const res = await axios.post(`https://my-first-deploy-n8du.onrender.com/api/upload/faculty/${user._id}`, formData, {
+      const res = await axios.post(`https://campus-management-system-xf9a.onrender.com/api/upload/faculty/${user._id}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       const updatedUser = { ...user, profileImg: res.data.filePath };
@@ -54,7 +54,7 @@ const FacultyDashboard = () => {
   useEffect(() => {
     const syncProfile = async () => {
       try {
-        const res = await axios.get('https://my-first-deploy-n8du.onrender.com/api/faculty');
+        const res = await axios.get('https://campus-management-system-xf9a.onrender.com/api/faculty');
         const me = res.data.find(f => f.userId?._id === user._id);
         if (me && me.profileImg && me.profileImg !== user.profileImg) {
           const updatedUser = { ...user, profileImg: me.profileImg };
@@ -122,12 +122,12 @@ const FacultyDashboard = () => {
         const offsetDate = new Date(dateObj.getTime() - (dateObj.getTimezoneOffset() * 60000));
         const dateStr = offsetDate.toISOString().split('T')[0];
 
-        const schRes = await axios.get('https://my-first-deploy-n8du.onrender.com/api/schedule');
+        const schRes = await axios.get('https://campus-management-system-xf9a.onrender.com/api/schedule');
         const myClassesToday = schRes.data.filter(item => item.facultyName === user.name && item.day === dayName);
         
         const classesWithStatus = await Promise.all(myClassesToday.map(async (cls) => {
           try {
-            const attRes = await axios.get(`https://my-first-deploy-n8du.onrender.com/api/attendance/batch/${cls.batch}/${dateStr}`);
+            const attRes = await axios.get(`https://campus-management-system-xf9a.onrender.com/api/attendance/batch/${cls.batch}/${dateStr}`);
             return { ...cls, isMarked: attRes.data.length > 0 };
           } catch (e) { return { ...cls, isMarked: false }; }
         }));
@@ -145,8 +145,8 @@ const FacultyDashboard = () => {
     const fetchServerData = async () => {
       try {
         const [studentRes, examRes] = await Promise.allSettled([
-          axios.get('https://my-first-deploy-n8du.onrender.com/api/students'),
-          axios.get('https://my-first-deploy-n8du.onrender.com/api/exams')
+          axios.get('https://campus-management-system-xf9a.onrender.com/api/students'),
+          axios.get('https://campus-management-system-xf9a.onrender.com/api/exams')
         ]);
         const studentCount = studentRes.status === 'fulfilled' ? studentRes.value.data.length : 0;
         const examCount = examRes.status === 'fulfilled' ? examRes.value.data.length : 0;
@@ -195,7 +195,7 @@ const FacultyDashboard = () => {
           <div className="relative group mb-4">
             <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg border-4 border-white dark:border-gray-700">
               {user.profileImg ? (
-                <img src={`https://my-first-deploy-n8du.onrender.com${user.profileImg}`} alt="Profile" className="w-full h-full object-cover" onError={(e) => {e.target.onerror = null; e.target.src=""}} />
+                <img src={`https://campus-management-system-xf9a.onrender.com${user.profileImg}`} alt="Profile" className="w-full h-full object-cover" onError={(e) => {e.target.onerror = null; e.target.src=""}} />
               ) : (
                 <span>{user?.name?.charAt(0) || 'F'}</span>
               )}

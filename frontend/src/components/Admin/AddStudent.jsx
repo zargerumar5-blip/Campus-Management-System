@@ -25,12 +25,12 @@ const AddStudent = ({ isDark }) => {
   const fetchData = async () => {
     try {
       // 1. Fetch & Sort Courses (A-Z)
-      const cRes = await axios.get('http://localhost:5000/api/courses');
+      const cRes = await axios.get('https://campus-management-system-xf9a.onrender.com/api/courses');
       const sortedCourses = cRes.data.sort((a, b) => a.name.localeCompare(b.name));
       setCourses(sortedCourses);
 
       // 2. Fetch Students
-      const sRes = await axios.get('http://localhost:5000/api/students');
+      const sRes = await axios.get('https://campus-management-system-xf9a.onrender.com/api/students');
       
       // Get the 10 most recently added students (Reverse + Slice)
       let recentList = sRes.data.reverse().slice(0, 10);
@@ -54,13 +54,13 @@ const AddStudent = ({ isDark }) => {
     try {
       if (editingId) {
         // === UPDATE MODE ===
-        await axios.put(`http://localhost:5000/api/students/${editingId}`, formData);
+        await axios.put(`https://campus-management-system-xf9a.onrender.com/api/students/${editingId}`, formData);
         alert('✅ Student Updated Successfully!');
         setEditingId(null);
       } else {
         // === ADD MODE ===
         // 1. Create Login Account
-        const userRes = await axios.post('http://localhost:5000/api/auth/register', {
+        const userRes = await axios.post('https://campus-management-system-xf9a.onrender.com/api/auth/register', {
           name: formData.name,
           email: formData.email,
           password: formData.password,
@@ -68,7 +68,7 @@ const AddStudent = ({ isDark }) => {
         });
 
         // 2. Create Student Profile
-        await axios.post('http://localhost:5000/api/students/add', {
+        await axios.post('https://campus-management-system-xf9a.onrender.com/api/students/add', {
           userId: userRes.data._id,
           rollNum: formData.rollNum,
           course: formData.course,
@@ -107,7 +107,7 @@ const AddStudent = ({ isDark }) => {
   const handleDelete = async (id) => {
     if(!window.confirm("Are you sure? This will delete the student and their login.")) return;
     try {
-        await axios.delete(`http://localhost:5000/api/students/${id}`);
+        await axios.delete(`https://campus-management-system-xf9a.onrender.com/api/students/${id}`);
         fetchData(); 
     } catch (err) {
         alert("Delete failed: " + err.message);

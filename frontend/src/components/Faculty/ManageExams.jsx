@@ -21,11 +21,11 @@ const ManageExams = ({ isDark }) => {
   // --- FETCH DATA ---
   const fetchData = async () => {
     try {
-      const examRes = await axios.get('http://localhost:5000/api/exams');
+      const examRes = await axios.get('https://campus-management-system-xf9a.onrender.com/api/exams');
       const sortedExams = examRes.data.sort((a, b) => a.title.localeCompare(b.title));
       setExams(sortedExams);
       
-      const courseRes = await axios.get('http://localhost:5000/api/courses');
+      const courseRes = await axios.get('https://campus-management-system-xf9a.onrender.com/api/courses');
       const sortedCourses = courseRes.data.sort((a, b) => a.name.localeCompare(b.name));
       setCourses(sortedCourses);
     } catch (err) { console.error("Error fetching data"); }
@@ -38,11 +38,11 @@ const ManageExams = ({ isDark }) => {
     e.preventDefault();
     try {
       if(editingId) {
-          await axios.put(`http://localhost:5000/api/exams/${editingId}`, scheduleData);
+          await axios.put(`https://campus-management-system-xf9a.onrender.com/api/exams/${editingId}`, scheduleData);
           alert('✅ Schedule Updated!');
           setEditingId(null);
       } else {
-          await axios.post('http://localhost:5000/api/exams/schedule', scheduleData);
+          await axios.post('https://campus-management-system-xf9a.onrender.com/api/exams/schedule', scheduleData);
           alert('✅ Exam Scheduled!');
       }
       // Reset form
@@ -67,7 +67,7 @@ const ManageExams = ({ isDark }) => {
 
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this exam?")) return;
-    try { await axios.delete(`http://localhost:5000/api/exams/${id}`); fetchData(); } catch (err) { console.error(err); }
+    try { await axios.delete(`https://campus-management-system-xf9a.onrender.com/api/exams/${id}`); fetchData(); } catch (err) { console.error(err); }
   };
 
   const themeClass = isDark ? 'bg-gray-800 text-white' : 'bg-white text-gray-800';

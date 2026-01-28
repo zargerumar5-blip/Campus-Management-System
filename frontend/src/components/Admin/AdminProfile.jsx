@@ -16,7 +16,7 @@ const AdminProfile = ({ isDark }) => {
       setMessage('❌ Passwords do not match!'); return;
     }
     try {
-      const res = await axios.put(`http://localhost:5000/api/auth/update/${user._id}`, {
+      const res = await axios.put(`https://campus-management-system-xf9a.onrender.com/api/auth/update/${user._id}`, {
         name: formData.name, email: formData.email, password: formData.password || undefined
       });
       localStorage.setItem('user', JSON.stringify(res.data));
