@@ -13,8 +13,7 @@ import StudentTimetable from '../components/Student/StudentTimetable';
 import StudentProfile from '../components/Student/StudentProfile';
 import Settings from '../components/Settings';
 
-// ⚠️ YAHAN APNA ASLI RENDER BACKEND LINK DAALEIN ⚠️
-// Example: "https://campus-system-final.onrender.com"
+// ⚠️ AAPKA ASLI RENDER BACKEND LINK
 const API_BASE_URL = "https://campus-management-system-xf9a.onrender.com"; 
 
 const StudentDashboard = () => {
@@ -79,55 +78,67 @@ const StudentDashboard = () => {
 
   const t = translations[lang] || translations['English'];
 
-  // --- FETCH REAL DATA (CORRECTED LOGIC) ---
+  // --- 🛠️ FIXED & UPDATED LOGIC HERE ---
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
+        console.log("🔄 Fetching Data... Current User ID:", user._id);
+
         // 1. Fetch Exams
         const examRes = await axios.get(`${API_BASE_URL}/api/exams`);
         const sortedExams = examRes.data.sort((a, b) => new Date(a.date) - new Date(b.date));
         setExams(sortedExams);
 
-        // 2. Fetch Student Profile
+        // 2. Fetch Student Profile (Robust Matching)
         const allStudentsRes = await axios.get(`${API_BASE_URL}/api/students`);
-        const myProfile = allStudentsRes.data.find(s => s.userId?._id === user._id);
+        
+        // 🛠️ MAGIC FIX: Check both String ID and Object ID
+        const myProfile = allStudentsRes.data.find(s => {
+            const dbId = s.userId?._id || s.userId; // Handle populated object OR string ID
+            return dbId === user._id;
+        });
 
         let calculatedFeesStatus = "Checking...";
         let calculatedAttendance = 0;
 
         if (myProfile) {
+            console.log("✅ Student Profile Found:", myProfile);
             if (myProfile.language) setLang(myProfile.language);
             
-            // --- UPDATED FEE LOGIC (Handles Seed Data + Amounts) ---
+            // --- FEE LOGIC ---
             if (myProfile.feesPaid === true) {
-               // Agar Seed Data wala simple boolean hai
                calculatedFeesStatus = "Paid ✅";
             } else {
-               // Agar Amount wala logic hai
                const totalFee = Number(myProfile.feesTotal) || 20000; 
                const paidFee = Number(myProfile.feesPaidAmount) || 0;
                const balance = totalFee - paidFee;
-               
-               if (balance <= 0) {
-                 calculatedFeesStatus = "Paid ✅";
-               } else {
-                 calculatedFeesStatus = `Pending (₹${balance})`;
-               }
+               calculatedFeesStatus = balance <= 0 ? "Paid ✅" : `Pending (₹${balance})`;
             }
 
             // --- ATTENDANCE LOGIC ---
             try {
                 const attRes = await axios.get(`${API_BASE_URL}/api/attendance/${myProfile._id}`);
                 const records = attRes.data;
+                console.log("📊 Attendance Records Found:", records.length);
+
                 const totalDays = records.length;
-                const presentDays = records.filter(r => 
-                  ['Present', 'present', 'P'].includes(r.status)
-                ).length;
-                
-                calculatedAttendance = totalDays > 0 ? Math.round((presentDays / totalDays) * 100) : 0;
+                if (totalDays > 0) {
+                  // Count Present, present, or P
+                  const presentDays = records.filter(r => 
+                    ['Present', 'present', 'P'].includes(r.status)
+                  ).length;
+                  
+                  calculatedAttendance = Math.round((presentDays / totalDays) * 100);
+                  console.log(`🧮 Calculation: ${presentDays}/${totalDays} = ${calculatedAttendance}%`);
+                } else {
+                  console.log("⚠️ No attendance marked yet.");
+                }
+
             } catch (attErr) {
-                console.warn("Attendance fetch failed");
+                console.warn("❌ Attendance fetch failed:", attErr);
             }
+        } else {
+            console.error("❌ Profile NOT Found! (Login ID aur Database ID match nahi ho rahe)");
         }
         
         setStudentStats({ 
@@ -136,14 +147,16 @@ const StudentDashboard = () => {
         });
 
       } catch (err) { 
-        console.error("Error loading dashboard data:", err); 
-        // Agar error aaye, tab bhi UI kharab na ho
+        console.error("❌ Error loading dashboard data:", err); 
         setStudentStats(prev => ({ ...prev, feesStatus: "Server Error" }));
       } finally { 
         setLoading(false); 
       }
     };
-    fetchDashboardData();
+
+    if (user._id && user._id !== 'dummy') {
+      fetchDashboardData();
+    }
   }, [user._id]);
 
   const formatDate = (isoString) => {
