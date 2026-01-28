@@ -1,47 +1,52 @@
 const mongoose = require('mongoose');
+const dotenv = require('dotenv'); // ✅ Import dotenv
 const User = require('./models/User');
 const Student = require('./models/Student');
 
-// Database Connection
+// ✅ Load Environment Variables (Taaki .env file padh sake)
+dotenv.config();
 
-mongoose.connect(MONGO_URI)
+// Database Connection
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ Connected to MongoDB for Seeding'))
-  .catch((err) => console.error(err));
+  .catch((err) => {
+    console.error('❌ DB Connection Error in Seed:', err);
+    process.exit(1);
+  });
 
 const seedUsers = async () => {
   try {
-    // 1. Clear existing data to avoid duplicates
+    // 1. Clear existing data
     await User.deleteMany({});
     await Student.deleteMany({});
     console.log('🧹 Old data cleared!');
 
-    // 2. Create an Admin
+    // 2. Create Admin
+    // NOTE: Naya Login Email/Pass yeh hoga:
     const adminUser = await User.create({
-      name: 'Zargar Omar', // Project Leader Name
-      email: 'admin@svm.com',
-      password: 'admin123', // Simple password for testing
+      name: 'Zargar Omar', 
+      email: 'admin@svm.com', // Login ID
+      password: 'admin123',   // Login Password
       role: 'admin'
     });
     console.log('👤 Admin Created: admin@svm.com / admin123');
 
-    // 3. Create a Faculty
+    // 3. Create Faculty
     await User.create({
       name: 'Dr. Sharma',
       email: 'faculty@svm.com',
       password: 'faculty123',
       role: 'faculty'
     });
-    console.log('👨‍🏫 Faculty Created: faculty@svm.com / faculty123');
 
-    // 4. Create a Student (User Account + Student Details)
+    // 4. Create Student
     const studentUser = await User.create({
-      name: 'Pathan Fardin', // Team Member Name
+      name: 'Pathan Fardin',
       email: 'student@svm.com',
       password: 'student123',
       role: 'student'
     });
 
-    // Create the detailed student record linked to the user above
     await Student.create({
       userId: studentUser._id,
       rollNum: 'CS-2024-001',
