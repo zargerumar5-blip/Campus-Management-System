@@ -13,6 +13,10 @@ import StudentTimetable from '../components/Student/StudentTimetable';
 import StudentProfile from '../components/Student/StudentProfile';
 import Settings from '../components/Settings';
 
+// ⚠️ YAHAN APNA ASLI RENDER BACKEND LINK DAALEIN ⚠️
+// Example: "https://campus-system-final.onrender.com"
+const API_BASE_URL = "https://campus-management-system-xf9a.onrender.com"; 
+
 const StudentDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   
@@ -24,7 +28,7 @@ const StudentDashboard = () => {
   
   const [exams, setExams] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [sidebarOpen, setSidebarOpen] = useState(false); // Mobile Sidebar State
+  const [sidebarOpen, setSidebarOpen] = useState(false); 
 
   const [theme, setTheme] = useState('light');
   const [lang, setLang] = useState('English'); 
@@ -41,7 +45,7 @@ const StudentDashboard = () => {
     formData.append('profileImg', file);
 
     try {
-      const res = await axios.post(`https://campusmanagementsystem-9kkd.onrender.com/api/upload/student/${user._id}`, formData, {
+      const res = await axios.post(`${API_BASE_URL}/api/upload/student/${user._id}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       const updatedUser = { ...user, profileImg: res.data.filePath };
@@ -50,7 +54,7 @@ const StudentDashboard = () => {
       alert('✅ Profile Picture Updated!');
     } catch (err) {
       console.error(err);
-      alert('Failed to upload image');
+      alert('Failed to upload image. Check backend connection.');
     }
   };
 
@@ -75,17 +79,17 @@ const StudentDashboard = () => {
 
   const t = translations[lang] || translations['English'];
 
-  // --- FETCH REAL DATA (UPDATED LOGIC) ---
+  // --- FETCH REAL DATA (CORRECTED LOGIC) ---
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         // 1. Fetch Exams
-        const examRes = await axios.get('https://campusmanagementsystem-9kkd.onrender.com/api/exams');
+        const examRes = await axios.get(`${API_BASE_URL}/api/exams`);
         const sortedExams = examRes.data.sort((a, b) => new Date(a.date) - new Date(b.date));
         setExams(sortedExams);
 
-        // 2. Fetch Student Profile for Fees
-        const allStudentsRes = await axios.get('https://campusmanagementsystem-9kkd.onrender.com/api/students');
+        // 2. Fetch Student Profile
+        const allStudentsRes = await axios.get(`${API_BASE_URL}/api/students`);
         const myProfile = allStudentsRes.data.find(s => s.userId?._id === user._id);
 
         let calculatedFeesStatus = "Checking...";
@@ -94,36 +98,38 @@ const StudentDashboard = () => {
         if (myProfile) {
             if (myProfile.language) setLang(myProfile.language);
             
-            // --- UPDATED FEE LOGIC ---
-            // Agar backend mein value nahi hai toh default 20000 maan lenge demo ke liye
-            const totalFee = Number(myProfile.feesTotal) || 20000; 
-            const paidFee = Number(myProfile.feesPaidAmount) || 0;
-            const balance = totalFee - paidFee;
-
-            if (balance <= 0) {
-              calculatedFeesStatus = "Paid ✅";
+            // --- UPDATED FEE LOGIC (Handles Seed Data + Amounts) ---
+            if (myProfile.feesPaid === true) {
+               // Agar Seed Data wala simple boolean hai
+               calculatedFeesStatus = "Paid ✅";
             } else {
-              calculatedFeesStatus = `Pending (₹${balance})`;
+               // Agar Amount wala logic hai
+               const totalFee = Number(myProfile.feesTotal) || 20000; 
+               const paidFee = Number(myProfile.feesPaidAmount) || 0;
+               const balance = totalFee - paidFee;
+               
+               if (balance <= 0) {
+                 calculatedFeesStatus = "Paid ✅";
+               } else {
+                 calculatedFeesStatus = `Pending (₹${balance})`;
+               }
             }
 
-            // --- UPDATED ATTENDANCE LOGIC ---
+            // --- ATTENDANCE LOGIC ---
             try {
-                const attRes = await axios.get(`https://campusmanagementsystem-9kkd.onrender.com/api/attendance/${myProfile._id}`);
+                const attRes = await axios.get(`${API_BASE_URL}/api/attendance/${myProfile._id}`);
                 const records = attRes.data;
                 const totalDays = records.length;
-                
-                // Case-insensitive check (Present, present, P)
                 const presentDays = records.filter(r => 
-                  r.status === 'Present' || r.status === 'present' || r.status === 'P'
+                  ['Present', 'present', 'P'].includes(r.status)
                 ).length;
                 
                 calculatedAttendance = totalDays > 0 ? Math.round((presentDays / totalDays) * 100) : 0;
             } catch (attErr) {
-                console.warn("Attendance data fetch failed, showing 0%");
+                console.warn("Attendance fetch failed");
             }
         }
         
-        // Update State
         setStudentStats({ 
           attendance: calculatedAttendance, 
           feesStatus: calculatedFeesStatus 
@@ -131,7 +137,8 @@ const StudentDashboard = () => {
 
       } catch (err) { 
         console.error("Error loading dashboard data:", err); 
-        setStudentStats({ attendance: 0, feesStatus: "Error" });
+        // Agar error aaye, tab bhi UI kharab na ho
+        setStudentStats(prev => ({ ...prev, feesStatus: "Server Error" }));
       } finally { 
         setLoading(false); 
       }
@@ -182,7 +189,7 @@ const StudentDashboard = () => {
           <div className="relative group mb-4">
             <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center text-white text-3xl font-bold shadow-lg border-4 border-white dark:border-gray-700">
               {user.profileImg ? (
-                <img src={`https://campusmanagementsystem-9kkd.onrender.com${user.profileImg}`} alt="Profile" className="w-full h-full object-cover" onError={(e) => {e.target.onerror = null; e.target.src=""}} />
+                <img src={`${API_BASE_URL}${user.profileImg}`} alt="Profile" className="w-full h-full object-cover" onError={(e) => {e.target.onerror = null; e.target.src=""}} />
               ) : (
                 <span>{user?.name?.charAt(0) || 'S'}</span>
               )}
@@ -242,7 +249,7 @@ const StudentDashboard = () => {
                 </div>
               </div>
 
-              {/* Stats Cards - Updated with real data */}
+              {/* Stats Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <DashboardCard icon={<FaChartPie />} title={t.overallAtt} value={`${studentStats.attendance}%`} color="blue" isDark={isDark} />
                 <DashboardCard icon={<FaMoneyCheckAlt />} title={t.feesStatus} value={studentStats.feesStatus} color="green" isDark={isDark} />
@@ -293,8 +300,7 @@ const SidebarBtn = ({ label, icon, active, onClick, isDark }) => (
 );
 
 const DashboardCard = ({ icon, title, value, color, isDark }) => {
-  // Logic to change color if fees are pending
-  const isPending = typeof value === 'string' && value.includes('Pending');
+  const isPending = typeof value === 'string' && value.includes('Pending') || value === 'Error';
   const dynamicColor = isPending ? 'text-red-600 bg-red-100' : (color === 'blue' ? 'text-blue-600 bg-blue-100' : 'text-green-600 bg-green-100');
   
   return (
