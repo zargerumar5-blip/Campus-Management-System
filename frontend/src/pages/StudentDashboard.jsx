@@ -30,7 +30,7 @@ const StudentDashboard = () => {
   const [lang, setLang] = useState('English'); 
   const isDark = theme === 'dark';
 
-  // --- LOAD USER & HANDLE IMAGE UPLOAD ---
+  // --- LOAD USER ---
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')) || { name: 'Student', _id: 'dummy', role: 'student' });
 
   const handleImageUpload = async (e) => {
@@ -75,36 +75,66 @@ const StudentDashboard = () => {
 
   const t = translations[lang] || translations['English'];
 
-  // --- FETCH REAL DATA ---
+  // --- FETCH REAL DATA (UPDATED LOGIC) ---
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
+        // 1. Fetch Exams
         const examRes = await axios.get('https://campusmanagementsystem-9kkd.onrender.com/api/exams');
         const sortedExams = examRes.data.sort((a, b) => new Date(a.date) - new Date(b.date));
         setExams(sortedExams);
 
+        // 2. Fetch Student Profile for Fees
         const allStudentsRes = await axios.get('https://campusmanagementsystem-9kkd.onrender.com/api/students');
         const myProfile = allStudentsRes.data.find(s => s.userId?._id === user._id);
 
+        let calculatedFeesStatus = "Checking...";
+        let calculatedAttendance = 0;
+
         if (myProfile) {
             if (myProfile.language) setLang(myProfile.language);
-            const totalFee = myProfile.feesTotal || 15000;
-            const paidFee = myProfile.feesPaidAmount || 0;
-            const feesStatus = (totalFee - paidFee) <= 0 ? 'Paid' : 'Pending';
+            
+            // --- UPDATED FEE LOGIC ---
+            // Agar backend mein value nahi hai toh default 20000 maan lenge demo ke liye
+            const totalFee = Number(myProfile.feesTotal) || 20000; 
+            const paidFee = Number(myProfile.feesPaidAmount) || 0;
+            const balance = totalFee - paidFee;
 
+            if (balance <= 0) {
+              calculatedFeesStatus = "Paid ✅";
+            } else {
+              calculatedFeesStatus = `Pending (₹${balance})`;
+            }
+
+            // --- UPDATED ATTENDANCE LOGIC ---
             try {
                 const attRes = await axios.get(`https://campusmanagementsystem-9kkd.onrender.com/api/attendance/${myProfile._id}`);
                 const records = attRes.data;
                 const totalDays = records.length;
-                const presentDays = records.filter(r => r.status === 'Present').length;
-                const percentage = totalDays > 0 ? Math.round((presentDays / totalDays) * 100) : 0;
-                setStudentStats({ attendance: percentage, feesStatus });
+                
+                // Case-insensitive check (Present, present, P)
+                const presentDays = records.filter(r => 
+                  r.status === 'Present' || r.status === 'present' || r.status === 'P'
+                ).length;
+                
+                calculatedAttendance = totalDays > 0 ? Math.round((presentDays / totalDays) * 100) : 0;
             } catch (attErr) {
-                console.warn("Could not fetch attendance details.");
-                setStudentStats({ attendance: 0, feesStatus });
+                console.warn("Attendance data fetch failed, showing 0%");
             }
         }
-      } catch (err) { console.error("Error loading dashboard data:", err); } finally { setLoading(false); }
+        
+        // Update State
+        setStudentStats({ 
+          attendance: calculatedAttendance, 
+          feesStatus: calculatedFeesStatus 
+        });
+
+      } catch (err) { 
+        console.error("Error loading dashboard data:", err); 
+        setStudentStats({ attendance: 0, feesStatus: "Error" });
+      } finally { 
+        setLoading(false); 
+      }
     };
     fetchDashboardData();
   }, [user._id]);
@@ -142,7 +172,6 @@ const StudentDashboard = () => {
         ${isDark ? 'bg-gray-800' : 'bg-white'}
       `}>
         
-        {/* Close Button (Mobile) */}
         <div className="md:hidden absolute top-4 right-4 z-50">
           <button onClick={closeSidebar} className={`text-xl ${isDark ? 'text-white' : 'text-gray-600'}`}>
             <FaTimes />
@@ -150,7 +179,6 @@ const StudentDashboard = () => {
         </div>
 
         <div className="p-6 flex flex-col items-center border-b border-gray-100 dark:border-gray-700">
-          {/* PROFILE PICTURE */}
           <div className="relative group mb-4">
             <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center text-white text-3xl font-bold shadow-lg border-4 border-white dark:border-gray-700">
               {user.profileImg ? (
@@ -197,7 +225,6 @@ const StudentDashboard = () => {
         {/* SCROLLABLE CONTENT */}
         <div className="flex-1 p-4 md:p-8 overflow-y-auto">
           
-          {/* Desktop Header */}
           <header className="hidden md:flex flex-col md:flex-row justify-between items-center mb-8 bg-transparent">
             <div>
                <h1 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-slate-800'}`}>{t.title}</h1>
@@ -215,7 +242,7 @@ const StudentDashboard = () => {
                 </div>
               </div>
 
-              {/* Stats Cards */}
+              {/* Stats Cards - Updated with real data */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <DashboardCard icon={<FaChartPie />} title={t.overallAtt} value={`${studentStats.attendance}%`} color="blue" isDark={isDark} />
                 <DashboardCard icon={<FaMoneyCheckAlt />} title={t.feesStatus} value={studentStats.feesStatus} color="green" isDark={isDark} />
@@ -245,7 +272,6 @@ const StudentDashboard = () => {
              </div>
           )}
 
-          {/* Modules */}
           <div className="fade-in">
             {activeTab === 'profile' && <StudentProfile isDark={isDark} />}
             {activeTab === 'attendance' && <MyAttendance isDark={isDark} />}
@@ -267,11 +293,17 @@ const SidebarBtn = ({ label, icon, active, onClick, isDark }) => (
 );
 
 const DashboardCard = ({ icon, title, value, color, isDark }) => {
-  const colors = { blue: 'text-blue-600 bg-blue-100', green: 'text-green-600 bg-green-100' };
+  // Logic to change color if fees are pending
+  const isPending = typeof value === 'string' && value.includes('Pending');
+  const dynamicColor = isPending ? 'text-red-600 bg-red-100' : (color === 'blue' ? 'text-blue-600 bg-blue-100' : 'text-green-600 bg-green-100');
+  
   return (
     <div className={`p-6 rounded-3xl shadow-lg border border-transparent ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
-       <div className="flex justify-between items-start mb-4"><div className={`p-3 rounded-2xl ${colors[color]}`}>{icon}</div></div>
-       <div><h3 className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-slate-800'}`}>{value}</h3><p className="text-sm text-gray-400">{title}</p></div>
+       <div className="flex justify-between items-start mb-4"><div className={`p-3 rounded-2xl ${dynamicColor}`}>{icon}</div></div>
+       <div>
+         <h3 className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-slate-800'} ${isPending ? 'text-red-500' : ''}`}>{value}</h3>
+         <p className="text-sm text-gray-400">{title}</p>
+       </div>
     </div>
   );
 };
